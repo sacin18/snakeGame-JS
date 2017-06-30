@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>snake</title>
+    <style>
+        td {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body style="font-size:30px;" onload="document.getElementById('sout').innerHTML=speed.value;">
+    <p>snake game by sacin varma</p>
+    <canvas id="c1" style="border-style:dashed;border-color:red;border-width:3px;" width="400" height="400"></canvas>
+    <br> inverse speed :: &nbsp;<output id="sout"></output><input type="range" id="speed" onchange="document.getElementById('sout').innerHTML=speed.value;" max=1000 min=10 value=300><br>
+    <button id='b1' onclick="if(typeof d == 'undefined'||d=='undefined'){d=setInterval(game,parseInt(document.getElementById('speed').value));document.getElementById('score').innerHTML=s;document.getElementById('b1').style.display='none';document.getElementById('pp').style.visibility='visible';}"
+        style="padding-left:170px;padding-right:170px;font-size:30px;">start</button><br>
+    <!--<button id='b2' onclick="clearInterval(d);d='undefined';clearInterval(d1);d1='undefined';">stop</button>-->
+    <p id="pp" style="font-size:50px;margin-left:100px;visibility:hidden;">SCORE = <output id="score"></output></p>
+    <br>
+    <table border=1px style="text-align:center;font-size:40px;">
+        <tr>
+            <td></td>
+            <td onclick="i=3;">up</td>
+        </tr>
+        <tr>
+            <td onclick="i=2;">left</td>
+            <td onclick="i=1;">bottom</td>
+            <td onclick="i=0;">right</td>
+        </tr>
+    </table>
+    <button id="b3" onclick="window.history.go();" style="padding:30px;padding-left:100px;padding-right:100px;visibility:hidden;margin-top:-50px;">play again</button>
+    <img src="pear.png" id="pear" style="display:none;">
+    <img src="1sheadr.png" id="sheadr" style="display:none;">
+    <img src="1sheadl.png" id="sheadl" style="display:none;">
+    <img src="1sheadu.png" id="sheadu" style="display:none;">
+    <img src="1sheadb.png" id="sheadb" style="display:none;">
+    <img src="1snakebodyh.jpg" id="sbodyh" style="display:none;">
+    <img src="1snakebodyv.jpg" id="sbodyv" style="display:none;">
+</body>
+<script>
+    ca1 = document.getElementById('c1');
+    c1 = ca1.getContext("2d");
+    //c1.moveTo(0,0);
+    //c1.lineTo(400,400);
+    //c1.stroke();
+    //c1.fillStyle='green';
+    //c1.fillRect(0,0,20,20);
+    //c1.fill();
+    //c1.stroke();
+    sheadr = document.getElementById('sheadr');
+    sheadb = document.getElementById('sheadb');
+    sheadl = document.getElementById('sheadl');
+    sheadu = document.getElementById('sheadu');
+    sbodyh = document.getElementById('sbodyh');
+    sbodyv = document.getElementById('sbodyv');
+    c1.drawImage(sheadr, 0, 0, 20, 20);
+    var over = 0;
+    var food = 0,
+        fx = 0,
+        fy = 0;
+    var i = 0,
+        incx = -20,
+        incy = 0,
+        r = 500,
+        s = 1;
+    var p = new Array;
+    var x = new Array;
+    var y = new Array;
+    for (j = 0; j < s + 1; j++) {
+        p[j] = 0;
+        x[j] = incx;
+        y[j] = incy;
+    }
+
+    function check(e) {
+        console.log("check has been called");
+        e = e || window.event;
+        if (e.keyCode == '40') {
+            if (i != 3 && lock == 0) {
+                i = 1;
+                lock = 1;
+            }
+            console.log("40");
+        } else if (e.keyCode == '39') {
+            if (i != 2 && lock == 0) {
+                i = 0;
+                lock = 1;
+            }
+            console.log("39");
+        } else if (e.keyCode == '37') {
+            if (i != 0 && lock == 0) {
+                i = 2;
+                lock = 1;
+            }
+            console.log("37");
+        } else if (e.keyCode == '38') {
+            if (i != 1 && lock == 0) {
+                i = 3;
+                lock = 1;
+            }
+            console.log("38");
+        }
+    }
+
+    function refresh() {
+        c1.fillStyle = 'white';
+        c1.fillRect(0, 0, 400, 400);
+        c1.fill();
+        for (j = s + 1; j > 0; j--) {
+            p[j] = p[j - 1];
+            x[j] = x[j - 1];
+            y[j] = y[j - 1];
+        }
+        if (food == 0) {
+            fx = Math.round(Math.random() * 19) * 20;
+            fy = Math.round(Math.random() * 19) * 20;
+            food = 1;
+        }
+        /*
+        else
+        {
+        	c1.fillStyle='yellow';
+        	c1.fillRect(fx,fy,20,20);
+        	c1.fill();
+        }*/
+        //if(p!=s){d1=setInterval('snake(incx-20,incy)',2000);p=s;}
+    }
+
+    function game() {
+        refresh();
+        if (over == 0) snake();
+        if (over == 1) {
+            c1.fillStyle = 'red';
+            c1.font = "bold 50px Arial";
+            c1.fillText("GAME OVER!", 20, 200);
+            c1.fillText("SCORE :: " + s.toString(), 40, 270);
+            c1.fill();
+            document.getElementById('b3').style.visibility = "visible";
+        }
+        lock = 0;
+    }
+
+    function snake() {
+        //if(typeof d1 == 'undefined'||d1 == 'undefined')d1=setInterval(refresh,r+498);
+        //clearInterval(d1);
+        //document.onkeydown = check;
+        if (i == 0) {
+            incx += 20;
+            incx = incx % 400;
+            p[0] = 0;
+        } else if (i == 1) {
+            incy += 20;
+            incy = incy % 400;
+            p[0] = 1;
+        } else if (i == 2) {
+            incx -= 20;
+            incx = incx < 0 ? 380 : incx;
+            p[0] = 2;
+        } else if (i == 3) {
+            incy -= 20;
+            incy = incy < 0 ? 380 : incy;
+            p[0] = 3;
+        }
+        x[0] = incx;
+        y[0] = incy;
+        if (x[0] == fx && y[0] == fy) {
+            food = 0;
+            s++;
+            document.getElementById('score').innerHTML = s;
+        }
+        /*
+        for(j=0;j<s;j++){
+        	c1.fillStyle='green';
+        	if(p[j]==0)c1.fillRect((incx-j*20)<0?400-s*20+j*20:(incx-j*20),incy,20,20);
+        	else if(p[j]==1)c1.fillRect(incx,(incy-j*20)<0?400-s*20+j*20:(incy-j*20),20,20);
+        	else if(p[j]==2)c1.fillRect((incx+j*20)>380?s*20-j*20-20:(incx+j*20),incy,20,20);
+        	else if(p[j]==3)c1.fillRect(incx,(incy+j*20)>380?s*20-j*20-20:(incy+j*20),20,20);
+        	c1.fill();
+        }*/
+        /*
+        for(j=0;j<s;j++){
+        	c1.fillStyle='green';
+        	if(p[j]==0)c1.fillRect((x[j]-j*20)<0?400-s*20+j*20:(x[j]-j*20),y[j],20,20);
+        	else if(p[j]==1)c1.fillRect(x[j],(y[j]-j*20)<0?400-s*20+j*20:(y[j]-j*20),20,20);
+        	else if(p[j]==2)c1.fillRect((x[j]+j*20)>380?s*20-j*20-20:(x[j]+j*20),y[j],20,20);
+        	else if(p[j]==3)c1.fillRect(x[j],(y[j]+j*20)>380?s*20-j*20-20:(y[j]+j*20),20,20);
+        	c1.fill();
+        }*/
+        for (j = 0; j < s; j++) {
+            c1.fillStyle = 'blue';
+            if (p[j] == 0)
+            //if(j==0)c1.fillRect((x[j])<0?400-s*20+j*20:(x[j]),y[j],20,20);
+                if (j == 0) c1.drawImage(sheadr, (x[j]) < 0 ? 400 - s * 20 + j * 20 : (x[j]), y[j], 20, 20);
+                //else{c1.fillStyle='green';c1.fillRect((x[j])<0?400-s*20+j*20:(x[j]),y[j],20,20);}
+                else {
+                    c1.drawImage(sbodyh, (x[j]) < 0 ? 400 - s * 20 + j * 20 : (x[j]), y[j], 20, 20);
+                }
+            else if (p[j] == 1)
+            //if(j==0)c1.fillRect(x[j],(y[j])<0?400-s*20+j*20:(y[j]),20,20);
+                if (j == 0) {
+                    c1.drawImage(sheadb, x[j], (y[j]) < 0 ? 400 - s * 20 + j * 20 : (y[j]), 20, 20);
+                }
+                //else{c1.fillStyle='green';c1.fillRect(x[j],(y[j])<0?400-s*20+j*20:(y[j]),20,20);}
+                else {
+                    c1.drawImage(sbodyv, x[j], (y[j]) < 0 ? 400 - s * 20 + j * 20 : (y[j]), 20, 20);
+                }
+            else if (p[j] == 2)
+            //if(j==0)c1.fillRect((x[j])>380?s*20-j*20-20:(x[j]),y[j],20,20);
+                if (j == 0) c1.drawImage(sheadl, (x[j]) > 380 ? s * 20 - j * 20 - 20 : (x[j]), y[j], 20, 20);
+                //else{c1.fillStyle='green';c1.fillRect((x[j])>380?s*20-j*20-20:(x[j]),y[j],20,20);}
+                else {
+                    c1.drawImage(sbodyh, (x[j]) > 380 ? s * 20 - j * 20 - 20 : (x[j]), y[j], 20, 20);
+                }
+            else if (p[j] == 3)
+            //if(j==0)c1.fillRect(x[j],(y[j])>380?s*20-j*20-20:(y[j]),20,20);
+                if (j == 0) c1.drawImage(sheadu, x[j], (y[j]) > 380 ? s * 20 - j * 20 - 20 : (y[j]), 20, 20);
+                //else{c1.fillStyle='green';c1.fillRect(x[j],(y[j])>380?s*20-j*20-20:(y[j]),20,20);}
+                else {
+                    c1.drawImage(sbodyv, x[j], (y[j]) > 380 ? s * 20 - j * 20 - 20 : (y[j]), 20, 20);
+                }
+            c1.fill();
+            if (x[0] == x[j] && y[0] == y[j] && j != 0) {
+                over = 1;
+                break;
+            }
+        }
+        /*
+        c1.fillStyle='yellow';
+        c1.fillRect(fx,fy,20,20);
+        c1.fill();*/
+        img = document.getElementById('pear');
+        c1.drawImage(img, fx, fy, 20, 20);
+    }
+    document.onkeydown = check;
+</script>
+
+</html>
